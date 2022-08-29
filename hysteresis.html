@@ -18,6 +18,8 @@
 			InitialMessage: {checked: 'checked'},
 			OutRisingType: {value: ''},
 			OutRisingValue: {value: ''},
+			DeadBandType: {value: ''},
+			DeadBandValue: {value: ''},
 			OutFallingType: {value: ''},
 			OutFallingValue: {value: ''},
 			OutTopicType: {value: ''},
@@ -48,6 +50,11 @@
 			$('#node-input-OutRisingValue').typedInput({
 				default: 'pay',
 				typeField: $('#node-input-OutRisingType'),
+				types:['str', 'num', 'bool', optionOriginalPayload]
+			});
+			$('#node-input-DeadBandValue').typedInput({
+				default: 'pay',
+				typeField: $('#node-input-DeadBandType'),
 				types:['str', 'num', 'bool', optionOriginalPayload]
 			});
 			$('#node-input-OutFallingValue').typedInput({
@@ -123,6 +130,10 @@
 		<input type="text" id="node-input-OutRisingValue" style="width: 280px">
 	</div>
 	<div class="form-row">
+		<label style="width: 140px !important" for="node-input-DeadBandType"><i class="fa fa-sign-out"></i> Deadband</label>
+		<input type="hidden" id="node-input-DeadBandType">
+		<input  type="text" id="node-input-DeadBandValue" style="width: 280px">
+	<div class="form-row">
 		<label style="width: 140px !important" for="node-input-OutFallingType"><i class="fa fa-sign-out"></i> Lower Threshold</label>
 		<input type="hidden" id="node-input-OutFallingType">
 		<input type="text" id="node-input-OutFallingValue" style="width: 280px">
@@ -146,8 +157,8 @@
 				<code>Upper Threshold</code> then send output</li>
 		<li><code>msg.payload</code> is lesser than previous <code>msg.payload</code> AND <code>msg.payload</code> lesser or equal 
 				<code>Lower Threshold</code> then send output</li>
-		<li><code>msg.payload</code> is greater than <code>Lower Threshold</code> but lower than <code>Upper Threshold</code> do nothing</li>
-		<li>Once a threshold has been hit, no new output will be send until the respective opposite threshold is triggered </li>
+		<li><code>msg.payload</code> is greater than <code>Lower Threshold</code> but lower than <code>Upper Threshold</code> then send output</li>
+		<li>Once a threshold has been hit, no new output will be send until a new threshold is triggered </li>
 	</ul>
 	<h4>Fixed versus Dynamic Thresholds</h4>
 	<p>In the node settings either fixed or dynamic threshold can be specified.</p>
