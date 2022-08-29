@@ -1,5 +1,13 @@
 module.exports = function(RED) {
 
+	function DeadBandMessage(msg) {
+		msgNew.payload = (this.DeadBandType === 'pay' ? msgNew.payload : this.DeadBandValue);
+		msgNew.hystdirection = 'dead';
+		send(msgNew)
+		node.direction = 'dead';
+		nodeContext.set('Direction', node.direction);
+	}
+
 	function HysteresisNode(config) {
 		RED.nodes.createNode(this, config);
 
@@ -119,6 +127,11 @@ module.exports = function(RED) {
 						nodeContext.set('Direction', node.direction);
 						node.status({fill:'green', shape:'dot', text: TriggerValueFalling + '/' + CurrentValue + '/' + TriggerValueRising + ' (initial high band)'});
 					} else if ((CurrentValue > TriggerValueFalling) && (CurrentValue < TriggerValueRising)) {
+						msgNew.payload = (this.DeadBandType === 'pay' ? msgNew.payload : this.DeadBandValue);
+						msgNew.hystdirection = 'initial dead';
+						send(msgNew);
+						node.direction = 'dead';
+						nodeContext.set('Direction', node.direction);
 						node.status({fill:'green', shape:'dot', text: TriggerValueFalling + '/' + CurrentValue + '/' + TriggerValueRising + ' (initial dead band)'});
 					} else if (CurrentValue <= TriggerValueFalling) {
 						msgNew.payload = (this.OutFallingType === 'pay' ? msgNew.payload : this.OutFallingValue);
@@ -151,12 +164,16 @@ module.exports = function(RED) {
 					} else if (CurrentValue < node.LastValue && CurrentValue >= TriggerValueRising && node.direction === 'high') {
 						node.status({fill:'green', shape:'dot', text: TriggerValueFalling + '/' + CurrentValue + '/' + TriggerValueRising + ' (high band falling)'});
 					} else if (CurrentValue > node.LastValue && CurrentValue > TriggerValueFalling && CurrentValue < TriggerValueRising && node.direction === 'high') {
+						DeadBandMessage(msgNew);
 						node.status({fill:'green', shape:'ring', text: TriggerValueFalling + '/' + CurrentValue + '/' + TriggerValueRising + ' (high dead band rising)'});
 					} else if (CurrentValue < node.LastValue && CurrentValue > TriggerValueFalling && CurrentValue < TriggerValueRising && node.direction === 'high') {
+						DeadBandMessage(msgNew);
 						node.status({fill:'green', shape:'ring', text: TriggerValueFalling + '/' + CurrentValue + '/' + TriggerValueRising + ' (high dead band falling)'});
 					} else if (CurrentValue > node.LastValue && CurrentValue > TriggerValueFalling && CurrentValue < TriggerValueRising && node.direction === 'low') {
+						DeadBandMessage(msgNew);
 						node.status({fill:'blue', shape:'ring', text: TriggerValueFalling + '/' + CurrentValue + '/' + TriggerValueRising + ' (low dead band rising)'});
 					} else if (CurrentValue < node.LastValue && CurrentValue > TriggerValueFalling && CurrentValue < TriggerValueRising && node.direction === 'low') {
+						DeadBandMessage(msgNew);
 						node.status({fill:'blue', shape:'ring', text: TriggerValueFalling + '/' + CurrentValue + '/' + TriggerValueRising + ' (low dead band falling)'});
 					} else if (CurrentValue > node.LastValue && CurrentValue <= TriggerValueFalling && node.direction === 'low') {
 						node.status({fill:'blue', shape:'dot', text: TriggerValueFalling + '/' + CurrentValue + '/' + TriggerValueRising + ' (low band rising)'});
